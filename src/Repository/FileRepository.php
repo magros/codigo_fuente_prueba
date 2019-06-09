@@ -66,6 +66,7 @@ class FileRepository extends ServiceEntityRepository
     {
         // Create our query
         $query = $this->createQueryBuilder('p')
+            ->orderBy('p.id','DESC')
             ->getQuery();
 
 

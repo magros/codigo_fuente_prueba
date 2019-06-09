@@ -2,15 +2,15 @@
     <div class="card">
         <div class="card-header">
             SDS Binder
-            <a href="/file/create" class="btn btn-info float-right">Upload File</a>
+            <a href="/file/create" class="btn btn-info float-right"><span class="fa fa-upload text-white"></span> Upload SDS</a>
         </div>
         <div class="card-body">
             <div v-if="!files.length" class="text-center pb-4 pt-4">
                 You dont have existing records upload one
             </div>
-            <table class="table" v-if="files.length">
+            <table class="table table-striped" v-if="files.length">
                 <thead>
-                <tr>
+                <tr class="table-active">
                     <td>Product Name</td>
                     <td>Item # / SDS #</td>
                     <td>Manufacturer</td>
@@ -103,6 +103,9 @@
 <style scoped lang="scss">
     @import "../../css/colors";
 
+    .card-body{
+        padding: 0;
+    }
     .fa {
         margin-right: 10px;
         color: $blue;

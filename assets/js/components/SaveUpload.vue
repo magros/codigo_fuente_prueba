@@ -20,10 +20,15 @@
                 </div>
 
 
-                <div class="custom-file col-md-6">
-                    <input type="file" class="custom-file-input" id="validatedCustomFile" :required="!file.id"
-                           @change="attachFile($event)">
-                    <label class="custom-file-label" for="validatedCustomFile">Choose file...</label>
+                <div class="form-group col-md-6 file-input">
+                    <label class="" for="file">File</label>
+                    <label class="fileContainer">
+                        <span class="fileName" v-if="fileBlob" >{{fileBlob.name}}</span>
+                        <span class="fa fa-upload"></span>
+                        <input type="file" class="form-control-file" id="file" :required="!file.id"
+                               @change="attachFile($event)">
+                    </label>
+
                     <small v-if="file.id">You can upload another file to replace <a :href="`/files/${file.id}/pdf`"
                                                                                     target="_blank">existing one</a>
                     </small>
@@ -37,6 +42,9 @@
 
                 <div class="col-md-12 text-center mt-5" @click="save">
                     <button type="submit" class="btn btn-lg btn-outline-info" :disabled="saving">Save</button>
+                    <div class="spinner-border text-info" role="status" v-show="saving">
+                        <span class="sr-only">Loading...</span>
+                    </div>
                 </div>
             </form>
         </div>
@@ -54,13 +62,17 @@
         data: () => {
             return {
                 // file: {manufacturer: null, title: null, itemId: null},
-                saving: false
+                saving: false,
+                fileBlob: null
             }
         },
         methods: {
             save() {
                 if (!this.isFormValid()) {
                     this.$swal("Incomplete data!", "All fields are mandatory", "error");
+                    return;
+                }
+                if (this.saving){
                     return;
                 }
                 this.saving = true;
@@ -83,7 +95,10 @@
                         this.saving = false;
                         this.$swal("File saved!", "Your file has ben saved!", "success");
                     }
-                );
+                ).catch((error) => {
+                    this.$swal("An error has ocurred!", error.response.data, "error");
+                    this.saving = false;
+                });
             },
             attachFile(event) {
                 let blob = event.target.files[0];
@@ -91,7 +106,9 @@
                     this.$swal("Invalid file!", "Your file must be a pdf!", "error");
                     return;
                 }
+                console.log(blob);
                 this.file.file = blob;
+                this.fileBlob = blob;
             },
             isFormValid: function () {
 
@@ -103,8 +120,75 @@
     }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+
+    @import "../../css/colors";
+
     .form-group, .custom-file {
         margin-top: 25px;
+    }
+    .file-input {
+
+        .fileContainer {
+            overflow: hidden;
+            position: relative;
+            padding: 0;
+        }
+
+        .fileContainer [type=file] {
+            cursor: inherit;
+            display: block;
+            font-size: 999px;
+            filter: alpha(opacity=0);
+            min-height: 100%;
+            min-width: 100%;
+            opacity: 0;
+            position: absolute;
+            right: 0;
+            text-align: right;
+            top: 0;
+        }
+
+        /* Example stylistic flourishes */
+
+        .fileContainer {
+            background: $grey;
+            border-radius: .25em;
+            float: left;
+        }
+
+        .fileContainer [type=file] {
+            cursor: pointer;
+        }
+
+        label, input{
+            display: inline;
+            cursor: pointer;
+        }
+        label:first-child{
+            width: 10%;
+        }
+        label:nth-child(2){
+            width: 70%;
+            height: 34px;
+        }
+        .fa{
+            float: right;
+            background-color: white;
+            height: 100%;
+            padding: 8px;
+            border: 1px solid lightgrey;
+            border-radius: 0 0.25rem 0.25rem 0;
+        }
+        .fileName{
+            position: relative;
+            padding: 5px 10px;
+            display: inline-block;
+            width: 87%;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: #6c757d;
+            overflow-x: hidden;
+        }
     }
 </style>

@@ -9,11 +9,22 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class FileController extends AbstractController
 {
 
     const ITEMS_PER_PAGE = 5;
+
+    /**
+     * @Route("/", name="index")
+     */
+    public function indexPath()
+    {
+        return $this->redirectToRoute('file');
+
+//        return $this->render('file/index.html.twig');
+    }
 
     /**
      * @Route("/file", name="file")
@@ -29,8 +40,8 @@ class FileController extends AbstractController
     public function create()
     {
         return $this->render('file/create.html.twig', ['file' => json_encode([
-            'title'=>'',
-            'manufacturer'=>''
+            'title' => '',
+            'manufacturer' => ''
         ])]);
     }
 
@@ -57,7 +68,7 @@ class FileController extends AbstractController
     /**
      * @Route("/api/files", name="file.store.post", methods={"POST"})
      */
-    public function store(): Response
+    public function store(ValidatorInterface $validator): Response
     {
         $request = Request::createFromGlobals();
 
@@ -70,6 +81,15 @@ class FileController extends AbstractController
         $fileRecord->setItemId($request->get('itemId'));
         $fileRecord->setManufacturer($request->get('manufacturer'));
         $fileRecord->setPath('empty');
+
+        $errors = $validator->validate($fileRecord);
+
+        if (count($errors) > 0) {
+
+            $errorsString = (string)$errors;
+
+            return new Response($errorsString, 400);
+        }
 
         $entityManager->persist($fileRecord);
 
@@ -124,7 +144,7 @@ class FileController extends AbstractController
     /**
      * @Route("/api/files/{id}", name="file.update", methods={"POST"})
      */
-    public function update($id): Response
+    public function update($id, ValidatorInterface $validator): Response
     {
         $request = Request::createFromGlobals();
 
@@ -136,7 +156,16 @@ class FileController extends AbstractController
         $entity->setItemId($request->get('itemId'));
         $entity->setManufacturer($request->get('manufacturer'));
 
-        if($file) $this->handleUploadedFile($file, $entity->getId());
+        $errors = $validator->validate($entity);
+
+        if (count($errors) > 0) {
+
+            $errorsString = (string)$errors;
+
+            return new Response($errorsString, 400);
+        }
+
+        if ($file) $this->handleUploadedFile($file, $entity->getId());
 
         $this->getDoctrine()->getManager()->persist($entity);
 
