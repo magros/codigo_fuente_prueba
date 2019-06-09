@@ -6,7 +6,7 @@
         </div>
         <div class="card-body">
             <div v-if="!files.length" class="text-center pb-4 pt-4">
-                You dont have existing records upload one
+                You dont have existing records <a href="/file/create">upload one</a>
             </div>
             <table class="table table-striped" v-if="files.length">
                 <thead>
