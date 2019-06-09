@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Creating File!{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="col-md-10 offset-1 mt-4">
+            <save-upload :file="{{ file }}"></save-upload>
+        </div>
+    </div>
+{% endblock %}
